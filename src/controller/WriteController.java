@@ -1,5 +1,7 @@
 package controller;
 
+import java.nio.file.Paths;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
@@ -16,7 +18,14 @@ public class WriteController implements Controller{
 			String title = req.getParameter("title");
 			String content = req.getParameter("content");
 			Part filePart = req.getPart("file");
-			String name = filePart.getSubmittedFileName();
+			
+			String filename = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
+			
+	
+			System.out.println(req.getServletContext().getRealPath("/WEB-INF/" + filename));
+			filePart.write(req.getServletContext().getRealPath("/WEB-INF/" + filename));
+			
+			
 			//파일업로드할꺼면 여기서 파일도 받아줘야해
 			UserVO user = (UserVO)req.getSession().getAttribute("user");
 			
@@ -24,7 +33,7 @@ public class WriteController implements Controller{
 			data.setTitle(title);
 			data.setContent(content);
 			data.setWriter(user.getId());
-			data.setFiles("");
+			data.setFiles(filename);
 			
 			int res = BoardDAO.getIns().write(data);
 			
